@@ -1,0 +1,51 @@
+{
+  "name": "@foundry-north/core",
+  "version": "1.0.0",
+  "description": "Shared resilience, observability, and event utilities for Foundry North platforms",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./resilience": {
+      "import": "./dist/resilience/index.js",
+      "types": "./dist/resilience/index.d.ts"
+    },
+    "./observability": {
+      "import": "./dist/observability/index.js",
+      "types": "./dist/observability/index.d.ts"
+    },
+    "./events": {
+      "import": "./dist/events/index.js",
+      "types": "./dist/events/index.d.ts"
+    },
+    "./env": {
+      "import": "./dist/env/index.js",
+      "types": "./dist/env/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
