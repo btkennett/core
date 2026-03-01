@@ -16,4 +16,5 @@ export * from "./events/index.js";
 export * from "./env/index.js";
 export * from "./types/index.js";
 export * from "./text/index.js";
+export * from "./cache/index.js";
 //# sourceMappingURL=index.d.ts.map
