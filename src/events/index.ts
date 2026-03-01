@@ -3,7 +3,7 @@ export {
   verifyHmac,
   EVENT_SIGNATURE_HEADERS,
   type HmacOptions,
-} from "./hmac";
+} from "./hmac.js";
 
 export {
   type EventEnvelope,
@@ -12,4 +12,4 @@ export {
   type FulfillmentEventType,
   type CompassSyncEventType,
   type FnEventType,
-} from "./event-envelope";
+} from "./event-envelope.js";

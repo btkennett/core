@@ -4,13 +4,13 @@ export {
   type CircuitBreakerOptions,
   type CircuitBreakerMetrics,
   type CircuitState,
-} from "./circuit-breaker";
+} from "./circuit-breaker.js";
 
 export {
   ConcurrencyLimiter,
   type ConcurrencyLimiterOptions,
   type ConcurrencyStatus,
-} from "./concurrency-limiter";
+} from "./concurrency-limiter.js";
 
 export {
   API_RETRY,
@@ -20,4 +20,4 @@ export {
   SERVERLESS_RETRY,
   calculateRetryDelay,
   type RetryPreset,
-} from "./retry-presets";
+} from "./retry-presets.js";

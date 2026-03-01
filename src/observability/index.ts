@@ -3,11 +3,11 @@ export {
   type MemoryMonitorConfig,
   type MemoryStats,
   type MemoryHealth,
-} from "./memory-monitor";
+} from "./memory-monitor.js";
 
 export {
   monitoredOperation,
   timedOperation,
   type MonitoredOperationOptions,
   type MonitoredResult,
-} from "./monitored-operation";
+} from "./monitored-operation.js";

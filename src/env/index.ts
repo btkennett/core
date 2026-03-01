@@ -3,4 +3,4 @@ export {
   EnvValidationError,
   type ValidateEnvOptions,
   type SafeParseableSchema,
-} from "./validator";
+} from "./validator.js";

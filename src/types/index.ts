@@ -6,4 +6,4 @@ export {
   type ApiError,
   type ApiResponse,
   type ErrorCode,
-} from "./api-response";
+} from "./api-response.js";

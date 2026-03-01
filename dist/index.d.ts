@@ -10,9 +10,9 @@
  *
  * This barrel re-exports everything for convenience.
  */
-export * from "./resilience";
-export * from "./observability";
-export * from "./events";
-export * from "./env";
-export * from "./types";
+export * from "./resilience/index.js";
+export * from "./observability/index.js";
+export * from "./events/index.js";
+export * from "./env/index.js";
+export * from "./types/index.js";
 //# sourceMappingURL=index.d.ts.map
