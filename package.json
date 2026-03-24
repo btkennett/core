@@ -2,6 +2,7 @@
   "name": "@foundrynorth/core",
   "version": "1.0.0",
   "description": "Shared resilience, observability, and event utilities for Foundry North platforms",
+  "license": "UNLICENSED",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
