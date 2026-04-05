@@ -46,7 +46,12 @@ function getCTComponents(date: Date): {
     day: parseInt(get("day"), 10),
     hour: parseInt(get("hour"), 10),
     minute: parseInt(get("minute"), 10),
-    dayOfWeek: dayOfWeekMap[weekdayStr] ?? 0,
+    dayOfWeek: (() => {
+      const dow = dayOfWeekMap[weekdayStr];
+      if (dow === undefined)
+        throw new Error(`Unexpected weekday: ${weekdayStr}`);
+      return dow;
+    })(),
   };
 }
 
@@ -55,6 +60,28 @@ function getCTComponents(date: Date): {
  */
 function isBusinessDay(dayOfWeek: number): boolean {
   return dayOfWeek >= 1 && dayOfWeek <= 5;
+}
+
+/**
+ * Convert a CT calendar date + time to a UTC Date object.
+ * Uses Intl round-trip: format a known UTC instant in CT, compare, and adjust.
+ * This correctly handles DST gaps and overlaps.
+ */
+function ctCalendarDateToUTC(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number,
+): Date {
+  // Start with a rough UTC guess (CT is UTC-5 or UTC-6)
+  const guess = new Date(Date.UTC(year, month - 1, day, hour + 6, minute));
+  const ct = getCTComponents(guess);
+  // Adjust by the difference between desired CT time and actual CT time
+  const diffMs =
+    ((hour - ct.hour) * 60 + (minute - ct.minute)) * 60 * 1000 +
+    (day - ct.day) * 24 * 60 * 60 * 1000;
+  return new Date(guess.getTime() + diffMs);
 }
 
 /**
@@ -94,84 +121,62 @@ export function businessDaysExact(from: Date, to: Date): number {
 
   let totalMinutes = 0;
 
-  // Iterate day by day from `from` to `to` in CT
-  // We need to walk through each calendar day in CT that the range spans
+  // Get CT calendar date components for from and to
   const fromCT = getCTComponents(from);
   const toCT = getCTComponents(to);
 
-  // Create a cursor that starts at the beginning of `from`'s CT day
-  // We'll iterate through each calendar day
-  // Use a millisecond cursor starting at midnight CT of `from`'s day
+  // Iterate by CT calendar date to avoid DST cursor drift.
+  // Start at from's CT date and increment day-by-day until we pass to's CT date.
+  let curYear = fromCT.year;
+  let curMonth = fromCT.month;
+  let curDay = fromCT.day;
 
-  // Get midnight CT of the from-date by constructing a date string
-  // and using the timezone offset approach
-  let cursor = new Date(from.getTime());
-
-  // Walk day by day
-  // To avoid infinite loops, cap at a reasonable number of iterations
-  const maxDays = Math.ceil(
-    (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24),
-  ) + 2;
+  // Cap iterations to prevent infinite loops
+  const maxDays =
+    Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)) + 2;
 
   for (let i = 0; i < maxDays; i++) {
-    const cursorCT = getCTComponents(cursor);
+    // Build a noon CT Date for this calendar day to reliably get weekday.
+    // Noon avoids landing in the DST gap or ambiguous hour.
+    const probeDate = ctCalendarDateToUTC(curYear, curMonth, curDay, 12, 0);
+    const probeCT = getCTComponents(probeDate);
 
-    if (isBusinessDay(cursorCT.dayOfWeek)) {
-      // Determine the start minute-of-day for this calendar day
-      let dayStartMinute: number;
-      let dayEndMinute: number;
-
-      // Check if this is the same CT calendar day as `from`
+    if (isBusinessDay(probeCT.dayOfWeek)) {
       const isSameDayAsFrom =
-        cursorCT.year === fromCT.year &&
-        cursorCT.month === fromCT.month &&
-        cursorCT.day === fromCT.day;
+        curYear === fromCT.year &&
+        curMonth === fromCT.month &&
+        curDay === fromCT.day;
 
-      // Check if this is the same CT calendar day as `to`
       const isSameDayAsTo =
-        cursorCT.year === toCT.year &&
-        cursorCT.month === toCT.month &&
-        cursorCT.day === toCT.day;
+        curYear === toCT.year &&
+        curMonth === toCT.month &&
+        curDay === toCT.day;
 
-      if (isSameDayAsFrom) {
-        dayStartMinute = cursorCT.hour * 60 + cursorCT.minute;
-      } else {
-        dayStartMinute = 0; // Full day from start of business
-      }
+      const dayStartMinute = isSameDayAsFrom
+        ? fromCT.hour * 60 + fromCT.minute
+        : 0;
 
-      if (isSameDayAsTo) {
-        dayEndMinute = toCT.hour * 60 + toCT.minute;
-      } else {
-        dayEndMinute = 24 * 60; // Full day to end of business
-      }
+      const dayEndMinute = isSameDayAsTo
+        ? toCT.hour * 60 + toCT.minute
+        : 24 * 60;
 
       totalMinutes += businessMinutesInDay(dayStartMinute, dayEndMinute);
     }
 
-    // Advance cursor to next CT calendar day
-    // Move forward ~24h, but we need to land on the next calendar day in CT
-    // Add 24 hours and then check if we've passed `to`
-    const nextCursor = new Date(cursor.getTime() + 24 * 60 * 60 * 1000);
-    const nextCT = getCTComponents(nextCursor);
-
-    // If adding 24h didn't change the day (DST edge), add another hour
-    if (nextCT.day === cursorCT.day && nextCT.month === cursorCT.month) {
-      cursor = new Date(nextCursor.getTime() + 60 * 60 * 1000);
-    } else {
-      cursor = nextCursor;
-    }
-
-    // Check if cursor's CT day is past `to`'s CT day
-    const updatedCT = getCTComponents(cursor);
+    // Stop if we've reached or passed to's CT calendar day
     if (
-      updatedCT.year > toCT.year ||
-      (updatedCT.year === toCT.year && updatedCT.month > toCT.month) ||
-      (updatedCT.year === toCT.year &&
-        updatedCT.month === toCT.month &&
-        updatedCT.day > toCT.day)
+      curYear > toCT.year ||
+      (curYear === toCT.year && curMonth > toCT.month) ||
+      (curYear === toCT.year && curMonth === toCT.month && curDay >= toCT.day)
     ) {
       break;
     }
+
+    // Advance to next calendar day
+    const next = new Date(Date.UTC(curYear, curMonth - 1, curDay + 1));
+    curYear = next.getUTCFullYear();
+    curMonth = next.getUTCMonth() + 1;
+    curDay = next.getUTCDate();
   }
 
   return totalMinutes / MINUTES_PER_BD;

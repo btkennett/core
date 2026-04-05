@@ -77,4 +77,44 @@ describe("businessDaysExact", () => {
     // Mon: 5h, Tue-Fri: 4 * 8h = 32h => total 37h = 37/8 = 4.625
     expect(businessDaysExact(from, to)).toBeCloseTo(4.625, 4);
   });
+
+  // --- DST transition tests ---
+
+  describe("DST spring-forward (March 8 2026, 2 AM CT → 3 AM CT)", () => {
+    it("Friday before to Monday after spring-forward = 0 BD (weekend)", () => {
+      // Fri Mar 6, 2026 5 PM CT = 23:00 UTC (CST = UTC-6)
+      const from = utc(2026, 3, 6, 23, 0);
+      // Mon Mar 9, 2026 9 AM CT = 14:00 UTC (CDT = UTC-5)
+      const to = utc(2026, 3, 9, 14, 0);
+      expect(businessDaysExact(from, to)).toBeCloseTo(0.0, 4);
+    });
+
+    it("Friday 3 PM to Monday 11 AM spanning spring-forward = 0.5 BD", () => {
+      // Fri Mar 6, 2026 3 PM CT = 21:00 UTC (CST = UTC-6)
+      const from = utc(2026, 3, 6, 21, 0);
+      // Mon Mar 9, 2026 11 AM CT = 16:00 UTC (CDT = UTC-5)
+      const to = utc(2026, 3, 9, 16, 0);
+      // Fri: 2h (3-5 PM), Mon: 2h (9-11 AM) = 4h = 0.5 BD
+      expect(businessDaysExact(from, to)).toBeCloseTo(0.5, 4);
+    });
+  });
+
+  describe("DST fall-back (November 1 2026, 2 AM CT → 1 AM CT)", () => {
+    it("Friday before to Monday after fall-back = 0 BD (weekend)", () => {
+      // Fri Oct 30, 2026 5 PM CT = 22:00 UTC (CDT = UTC-5)
+      const from = utc(2026, 10, 30, 22, 0);
+      // Mon Nov 2, 2026 9 AM CT = 15:00 UTC (CST = UTC-6)
+      const to = utc(2026, 11, 2, 15, 0);
+      expect(businessDaysExact(from, to)).toBeCloseTo(0.0, 4);
+    });
+
+    it("Friday 3 PM to Monday 11 AM spanning fall-back = 0.5 BD", () => {
+      // Fri Oct 30, 2026 3 PM CT = 20:00 UTC (CDT = UTC-5)
+      const from = utc(2026, 10, 30, 20, 0);
+      // Mon Nov 2, 2026 11 AM CT = 17:00 UTC (CST = UTC-6)
+      const to = utc(2026, 11, 2, 17, 0);
+      // Fri: 2h (3-5 PM), Mon: 2h (9-11 AM) = 4h = 0.5 BD
+      expect(businessDaysExact(from, to)).toBeCloseTo(0.5, 4);
+    });
+  });
 });
