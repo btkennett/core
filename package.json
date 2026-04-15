@@ -1,6 +1,6 @@
 {
   "name": "@foundrynorth/core",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Shared resilience, observability, and event utilities for Foundry North platforms",
   "type": "module",
   "main": "dist/index.js",
@@ -41,6 +41,10 @@
     "./time": {
       "import": "./dist/time/index.js",
       "types": "./dist/time/index.d.ts"
+    },
+    "./dataforseo": {
+      "import": "./dist/dataforseo/index.js",
+      "types": "./dist/dataforseo/index.d.ts"
     }
   },
   "files": [
