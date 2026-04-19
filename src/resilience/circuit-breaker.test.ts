@@ -86,6 +86,26 @@ describe("CircuitBreaker", () => {
     expect(cb.getMetrics().state).toBe("OPEN");
   });
 
+  it("does not open from failures that have aged out of the monitoring window", async () => {
+    vi.useFakeTimers();
+    const cb = makeBreaker({
+      failureThreshold: 2,
+      monitoringWindow: 50,
+      resetTimeout: 1_000,
+    });
+
+    await expect(cb.execute(() => Promise.reject(new Error("first")))).rejects.toThrow();
+    vi.advanceTimersByTime(60);
+
+    await expect(cb.execute(() => Promise.reject(new Error("second")))).rejects.toThrow();
+    expect(cb.getMetrics().state).toBe("CLOSED");
+
+    await expect(cb.execute(() => Promise.reject(new Error("third")))).rejects.toThrow();
+    expect(cb.getMetrics().state).toBe("OPEN");
+
+    vi.useRealTimers();
+  });
+
   it("reset() restores to initial state", async () => {
     const cb = makeBreaker({ failureThreshold: 1 });
     await expect(cb.execute(() => Promise.reject(new Error("x")))).rejects.toThrow();

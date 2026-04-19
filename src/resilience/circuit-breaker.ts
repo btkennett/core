@@ -119,7 +119,7 @@ export class CircuitBreaker {
       this.openCircuit();
     } else if (
       this.state === "CLOSED" &&
-      this.consecutiveFailures >= this.options.failureThreshold
+      this.recentFailures.length >= this.options.failureThreshold
     ) {
       this.openCircuit();
     }
@@ -156,8 +156,13 @@ export class CircuitBreaker {
     if (firstValid === -1) {
       // All failures are outside the window
       this.recentFailures.length = 0;
+      this.consecutiveFailures = 0;
     } else if (firstValid > 0) {
       this.recentFailures.splice(0, firstValid);
+      this.consecutiveFailures = Math.min(
+        this.consecutiveFailures,
+        this.recentFailures.length
+      );
     }
   }
 

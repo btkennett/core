@@ -1,6 +1,6 @@
 {
   "name": "@foundrynorth/core",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Shared resilience, observability, and event utilities for Foundry North platforms",
   "type": "module",
   "main": "dist/index.js",
