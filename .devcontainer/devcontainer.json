@@ -1,0 +1,20 @@
+{
+  "name": "@foundrynorth/core",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20-bookworm",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "node",
+  "updateRemoteUserUID": true,
+  "postCreateCommand": "npm ci",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "typescript.tsdk": "node_modules/typescript/lib"
+      }
+    }
+  }
+}

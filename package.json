@@ -1,7 +1,7 @@
 {
   "name": "@foundrynorth/core",
   "version": "1.0.4",
-  "description": "Shared resilience, observability, and event utilities for Foundry North platforms",
+  "description": "Shared platform utilities for Foundry North applications",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -54,7 +54,9 @@
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepublishOnly": "npm run build"
+    "pack:dry-run": "npm pack --dry-run",
+    "release:check": "npm run build && npm test && npm run pack:dry-run",
+    "prepublishOnly": "npm run release:check"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
