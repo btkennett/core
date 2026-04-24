@@ -1,0 +1,17 @@
+# Start with the platform owner. Add support engineer handles here as they onboard.
+* @btkennett
+
+# Package source and release surface
+/src/** @btkennett
+/tests/** @btkennett
+/dist/** @btkennett
+/package.json @btkennett
+/package-lock.json @btkennett
+/README.md @btkennett
+/.nvmrc @btkennett
+/.devcontainer/** @btkennett
+/.github/** @btkennett
+
+# Repo operating docs
+/AGENTS.md @btkennett
+/CLAUDE.md @btkennett
