@@ -1,8 +1,8 @@
 # @foundrynorth/core — Shared Platform Utilities
 
 ## Package Info
-- **npm**: `@foundrynorth/core@1.0.0` (public)
-- **Consumers**: fn-legacy, fn-flux, fn-worker
+- **npm**: `@foundrynorth/core@1.0.4` (public)
+- **Consumers**: fn-legacy, fn-flux, fn-forge, fn-v2. Historical fn-worker usage is deprecated.
 - **Module**: ESM (`"type": "module"`), Node >=18, ES2022 target
 
 ## Subpath Exports
@@ -17,23 +17,25 @@ Import from the specific module — never import from the package root in produc
 | `@foundrynorth/core/types` | Shared TypeScript types |
 | `@foundrynorth/core/text` | Text processing utilities |
 | `@foundrynorth/core/cache` | Caching utilities |
+| `@foundrynorth/core/time` | Business-day and shared time helpers |
+| `@foundrynorth/core/dataforseo` | DataForSEO location helpers and datasets |
 
 ## Commands
 ```bash
 npm run build          # Compile TypeScript (tsc)
 npm test               # Run tests (Vitest)
 npm run test:watch     # Watch mode
+npm run release:check  # Build + tests + npm pack dry run
 npm version patch      # Bump version
 npm publish            # Publish to npm (runs build via prepublishOnly)
 ```
 
 ## Publish Workflow
 1. Make changes in `src/`
-2. `npm run build` — verify clean compile
-3. `npm test` — verify tests pass
+2. `npm run release:check` — verify build, tests, and package contents
 4. `npm version patch` (or `minor`/`major`)
 5. `npm publish`
-6. Update consumers: `npm install @foundrynorth/core@latest` in fn-legacy, fn-flux, fn-worker
+6. Update consumers: `npm install @foundrynorth/core@latest` or `pnpm install @foundrynorth/core@latest` in fn-legacy, fn-flux, fn-forge, and fn-v2 as needed
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
